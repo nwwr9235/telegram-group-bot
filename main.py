@@ -41,10 +41,13 @@ except Exception as e:
     logger.error(f"❌ Aiogram error: {e}")
     sys.exit(1)
 
-# ✅ إنشاء البوت
-bot = Bot(token=settings.BOT_TOKEN, parse_mode="HTML")
-dp = Dispatcher()
-logger.info("✅ Bot created")
+from aiogram.client.default import DefaultBotProperties
+
+bot = Bot(
+    token=settings.BOT_TOKEN, 
+    default=DefaultBotProperties(parse_mode="HTML")
+)
+
 
 # ✅ ========== HANDLERS ==========
 
