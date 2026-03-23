@@ -1,3 +1,4 @@
+# bot/handlers/__init__.py
 from bot.handlers.commands import router as commands_router
 from bot.handlers.admin_text import router as admin_text_router
 from bot.handlers.captcha import router as captcha_router
