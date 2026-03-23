@@ -229,6 +229,15 @@ async def delete_message(message: Message):
     except Exception as e:
         await message.reply(f"❌ فشل: {str(e)}")
 
+# في نهاية قسم HANDLERS، أضف:
+@dp.message()
+async def catch_all(message: Message):
+    logger.info(f"📩 رسالة واردة: '{message.text}' | نوع المحادثة: {message.chat.type} | من: {message.from_user.id}")
+    # لا ترد إذا كانت في مجموعة لتجنب الفوضى
+    if message.chat.type == "private":
+        await message.reply("🤖 لم أفهم هذا الأمر. جرب /help")
+
+
 logger.info("✅ Handlers registered")
 
 # ✅ ========== WEB SERVER ==========
