@@ -261,12 +261,16 @@ async def on_shutdown():
 if settings.IS_WEBHOOK_MODE:
     logger.info("🔧 Webhook mode")
     
-    webhook_handler = SimpleRequestHandler(dispatcher=dp, bot=bot)
-    webhook_handler.register(app, path=settings.WEBHOOK_PATH)
-    setup_application(app, dp, bot=bot)
-    
+    # ← 1. سجل الأحداث أولاً
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
+    
+    # ← 2. ثم أنشئ الـ Handler
+    webhook_handler = SimpleRequestHandler(dispatcher=dp, bot=bot)
+    webhook_handler.register(app, path=settings.WEBHOOK_PATH)
+    
+    # ← 3. أخيراً اربط التطبيق (بعد تسجيل كل شيء)
+    setup_application(app, dp, bot=bot)
     
     logger.info(f"🌐 Starting on port {settings.PORT}")
     web.run_app(app, host="0.0.0.0", port=settings.PORT)
