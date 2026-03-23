@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-بوت تيليجرام - نسخة متوسطة
+بوت تيليجرام - النسخة النهائية
 """
 import asyncio
 import logging
@@ -19,36 +19,39 @@ logger.info("🚀 BOT IS STARTING...")
 logger.info("=" * 60)
 
 # ✅ استيراد الإعدادات
-try:
-    from bot.config.settings import settings
-    logger.info(f"✅ Settings loaded")
-    logger.info(f"   BOT_TOKEN: {'✅' if settings.BOT_TOKEN else '❌'}")
-    logger.info(f"   ADMIN_ID: {settings.ADMIN_ID}")
-    logger.info(f"   WEBHOOK_HOST: {settings.WEBHOOK_HOST or '❌ EMPTY'}")
-except Exception as e:
-    logger.error(f"❌ Settings error: {e}")
-    import traceback
-    traceback.print_exc()
-    sys.exit(1)
+from bot.config.settings import settings
+logger.info(f"✅ Settings loaded")
+logger.info(f"   WEBHOOK_HOST: {settings.WEBHOOK_HOST}")
 
-# ✅ استيراد aiogram
-try:
-    from aiogram import Bot, Dispatcher
-    from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-    from aiohttp import web
-    logger.info("✅ Aiogram imported")
-except Exception as e:
-    logger.error(f"❌ Aiogram error: {e}")
-    sys.exit(1)
+# ✅ استيراد aiogram (مُحدّث)
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
+logger.info("✅ Aiogram imported")
 
-# ✅ إنشاء البوت
-bot = Bot(token=settings.BOT_TOKEN, parse_mode="HTML")
+# ✅ إنشاء البوت (بدون تحذير)
+bot = Bot(
+    token=settings.BOT_TOKEN,
+    default=DefaultBotProperties(parse_mode="HTML")
+)
 dp = Dispatcher()
 
-# ✅ Handler بسيط
-@dp.message()
-async def echo(message):
-    await message.reply(f"Received: {message.text}")
+# ✅ Handlers
+from bot.handlers import (
+    commands_router,
+    admin_text_router,
+    captcha_router,
+    owner_router,
+    group_events_router
+)
+
+dp.include_router(commands_router)
+dp.include_router(admin_text_router)
+dp.include_router(captcha_router)
+dp.include_router(group_events_router)
+dp.include_router(owner_router)
+logger.info("✅ Routers registered")
 
 # ✅ Webhook setup
 async def on_startup():
